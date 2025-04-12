@@ -3,7 +3,7 @@ from autogen_agentchat.conditions import MaxMessageTermination, TextMentionTermi
 from autogen_agentchat.teams import RoundRobinGroupChat
 from autogen_agentchat.ui import Console
 from autogen_ext.models.openai import AzureOpenAIChatCompletionClient
-from azure.identity import DefaultAzureCredential
+from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 from azure.ai.projects import AIProjectClient
 from azure.ai.projects.models import BingGroundingTool
 import asyncio
@@ -11,6 +11,8 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
+
+token_provider = get_bearer_token_provider(DefaultAzureCredential(), "https://cognitiveservices.azure.com/.default")
 
 # Initialize environment variables
 API_KEY = os.getenv("api_key")
@@ -28,7 +30,8 @@ az_model_client = AzureOpenAIChatCompletionClient(
     model=MODEL_DEPLOYMENT_NAME,
     api_version=MODEL_API_VERSION,
     azure_endpoint=AZURE_ENDPOINT,
-    api_key=API_KEY
+    azure_ad_token_provider=token_provider,  # Optional if you choose key-based authentication.
+    #api_key="sk-...", # For key-based authentication.
 )
 
 ###############################################################################
